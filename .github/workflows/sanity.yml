@@ -1,0 +1,46 @@
+name: sanity
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tmux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux
+      - name: Check files exist
+        run: |
+          test -f README.md
+          test -f AGENT_BOOTSTRAP_PROMPT.md
+          test -f STACK_OVERVIEW.md
+          test -f scripts/install_stack.py
+          test -f scripts/bootstrap_doctor.py
+          test -f skills/install-manifest.json
+          test -f skills/autonomous-ai-agents/cli-coding-agent-orchestrator/SKILL.md
+          test -f skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/tmux_cli_supervisor.py
+          test -f tests/test_install_stack.py
+          test -f tests/test_supervisor.py
+      - name: Python syntax check
+        run: |
+          python3 -m py_compile \
+            scripts/install_stack.py \
+            scripts/bootstrap_doctor.py \
+            skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/tmux_cli_supervisor.py \
+            skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py \
+            tests/fixtures/fake_codex.py \
+            tests/test_install_stack.py \
+            tests/test_supervisor.py
+      - name: Shell syntax check
+        run: |
+          bash -n skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/run_codex_supervised.sh
+          bash -n skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/tmux_agent_control.sh
+          bash -n skills/autonomous-ai-agents/tmux-cli-agent-checkin/scripts/tmux_checkin.sh
+      - name: Run unit and tmux smoke tests
+        run: |
+          python3 -m unittest discover -s tests -v

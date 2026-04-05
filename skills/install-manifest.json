@@ -1,0 +1,12 @@
+{
+  "skills": {
+    "claude-code": { "tier": "core" },
+    "cli-coding-agent-orchestrator": { "tier": "core" },
+    "codex": { "tier": "core" },
+    "oh-my-codex": { "tier": "optional" },
+    "tmux-cli-agent-checkin": { "tier": "core" },
+    "tmux-cli-agent-resume": { "tier": "core" },
+    "tmux-cli-agent-supervisor": { "tier": "core" },
+    "tmux-codex-initialization": { "tier": "core" }
+  }
+}
