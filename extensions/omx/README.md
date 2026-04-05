@@ -51,7 +51,7 @@ It is not required by the default stack and should be treated as a user-selectab
 The default installer skips it; opt in with:
 
 ```bash
-python3 scripts/install_stack.py --dest /home/USER/.hermes/skills --include-skill oh-my-codex
+python3 scripts/install_stack.py --dest "$HOME/.hermes/skills" --include-skill oh-my-codex
 ```
 
 ## Suggested agent instruction

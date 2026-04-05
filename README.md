@@ -54,36 +54,44 @@ This repo intentionally excludes:
 
 Only portable skill content, prompt templates, and helper scripts are included.
 
+## Publish / support status
+
+- Safe to publish: the tracked tree is intended to be portable and credential-free.
+- Supported baseline: local scripts, docs, installer flow, and tmux smoke tests for the Codex-supervisor path.
+- Current focus: Codex-first orchestration. Gemini CLI and Claude Code are supported by the shared supervisor, but the deepest local smoke coverage is still on the Codex path.
+- Expected operator model: supervise and inspect only sessions this stack spawned, unless you explicitly choose to adopt an external tmux session.
+
 ## Prerequisites on the target machine
 
 - Python 3
 - tmux
 - Codex CLI (`codex`)
 - optional: Claude Code (`claude`) if you want that path
+- optional: Gemini CLI (`gemini`) if you want that path
 - a Hermes-compatible skill directory, usually `~/.hermes/skills`
 
 ## Install locally
 
 ```bash
-python3 scripts/install_stack.py --dest /home/USER/.hermes/skills
+python3 scripts/install_stack.py --dest "$HOME/.hermes/skills"
 ```
 
 To also install the optional OMX skill:
 
 ```bash
-python3 scripts/install_stack.py --dest /home/USER/.hermes/skills --include-skill oh-my-codex
+python3 scripts/install_stack.py --dest "$HOME/.hermes/skills" --include-skill oh-my-codex
 ```
 
 Compatibility alias:
 
 ```bash
-python3 scripts/install_stack.py --dest /home/USER/.hermes/skills --include-omx
+python3 scripts/install_stack.py --dest "$HOME/.hermes/skills" --include-omx
 ```
 
 Check prerequisites and see the recommended launch command:
 
 ```bash
-python3 scripts/bootstrap_doctor.py --dest /home/USER/.hermes/skills
+python3 scripts/bootstrap_doctor.py --dest "$HOME/.hermes/skills"
 ```
 
 The supervisor/job-manager runtime defaults to the installed stack root and writes logs under `agent-supervisor/` next to that root. You can override the runtime root with `HERMES_HOME=/abs/path`.
@@ -104,3 +112,7 @@ The recommendation is:
 - optional: OMX overlay
 
 That keeps the repo portable while still supporting your preferred power-user workflow.
+
+## License
+
+This repository is released under the MIT License. See `LICENSE`.

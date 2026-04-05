@@ -16,7 +16,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description='Install the core agent tmux coding skill stack into a Hermes-style skill directory. Optional OMX support must be enabled explicitly.'
     )
-    parser.add_argument('--dest', required=True, help='Destination skills directory, e.g. /home/user/.hermes/skills')
+    parser.add_argument('--dest', required=True, help='Destination skills directory, e.g. $HOME/.hermes/skills')
     parser.add_argument(
         '--include-skill',
         action='append',

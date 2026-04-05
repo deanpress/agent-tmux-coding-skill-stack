@@ -98,7 +98,7 @@ When updating or using Codex tmux supervisor flows:
 - Do not default to `$team` for small tasks; it is heavier-weight than a direct OMX session.
 - Do not use raw `codex` unless OMX is unavailable or there is a specific reason to bypass OMX.
 - Keep using tmux supervision for unattended interactive runs; OMX improves the runtime surface, but supervision still matters.
-- OMX setup installs a global Codex `notify` hook in `/home/devuser/.codex/config.toml`, so notify-hook code is active for this Codex home even in plain `codex` sessions, not just `omx` launches.
+- OMX setup installs a global Codex `notify` hook in the current user's Codex config, typically `$HOME/.codex/config.toml`, so notify-hook code is active for this Codex home even in plain `codex` sessions, not just `omx` launches.
 - OMX auto-nudge defaults to injecting `yes, proceed [OMX_TMUX_INJECT]` when it detects stall phrasing in tmux Codex panes.
 
 For tmux routing, notify-hook, and auto-nudge hardening guidance inside an `oh-my-codex` source checkout, see:

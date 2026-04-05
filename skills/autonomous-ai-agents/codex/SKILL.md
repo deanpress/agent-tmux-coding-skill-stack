@@ -27,7 +27,7 @@ Delegate coding tasks to [Codex](https://github.com/openai/codex) directly via t
 Use `codex exec` by default for non-interactive Codex jobs.
 
 ```
-terminal(command="codex exec --yolo -c model_reasoning_effort=\"high\" 'Add dark mode toggle to settings'", workdir="/home/devuser/project", pty=true)
+terminal(command="codex exec --yolo -c model_reasoning_effort=\"high\" 'Add dark mode toggle to settings'", workdir="$HOME/project", pty=true)
 ```
 
 For scratch work:
@@ -37,7 +37,7 @@ terminal(command="TMP=$(mktemp -d) && cd \"$TMP\" && git init && codex exec --yo
 
 For interactive work, launch Codex directly:
 ```
-terminal(command="codex --yolo", workdir="/home/devuser/project", pty=true)
+terminal(command="codex --yolo", workdir="$HOME/project", pty=true)
 ```
 
 ## Background Mode (Long Tasks)
@@ -46,7 +46,7 @@ For long non-interactive runs, prefer `codex exec` in the background. For long i
 
 ```
 # Start Codex exec in background with PTY
-terminal(command="codex exec --yolo -c model_reasoning_effort=\"high\" 'Refactor the auth module'", workdir="/home/devuser/project", background=true, pty=true)
+terminal(command="codex exec --yolo -c model_reasoning_effort=\"high\" 'Refactor the auth module'", workdir="$HOME/project", background=true, pty=true)
 # Returns session_id
 
 # Monitor progress
@@ -81,7 +81,7 @@ terminal(command="REVIEW=$(mktemp -d) && git clone https://github.com/user/repo.
 For this class of task, use multiple supervised tmux Codex sessions or separate worktrees you control explicitly.
 
 ```
-terminal(command="codex exec --yolo 'Fix the assigned issue set, verify each change, and report completion evidence'", workdir="/home/devuser/project", background=true, pty=true)
+terminal(command="codex exec --yolo 'Fix the assigned issue set, verify each change, and report completion evidence'", workdir="$HOME/project", background=true, pty=true)
 ```
 
 If you specifically need separate worktrees you control yourself, create them manually and run `codex exec --yolo` inside each worktree.
@@ -90,14 +90,14 @@ If you specifically need separate worktrees you control yourself, create them ma
 
 ```
 # Fetch all PR refs
-terminal(command="git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'", workdir="/home/devuser/project")
+terminal(command="git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'", workdir="$HOME/project")
 
 # Review multiple PRs in parallel
-terminal(command="codex exec --yolo 'Review PR #86. Use git diff origin/main...origin/pr/86 and summarize the most important findings.'", workdir="/home/devuser/project", background=true, pty=true)
-terminal(command="codex exec --yolo 'Review PR #87. Use git diff origin/main...origin/pr/87 and summarize the most important findings.'", workdir="/home/devuser/project", background=true, pty=true)
+terminal(command="codex exec --yolo 'Review PR #86. Use git diff origin/main...origin/pr/86 and summarize the most important findings.'", workdir="$HOME/project", background=true, pty=true)
+terminal(command="codex exec --yolo 'Review PR #87. Use git diff origin/main...origin/pr/87 and summarize the most important findings.'", workdir="$HOME/project", background=true, pty=true)
 
 # Post results
-terminal(command="gh pr comment 86 --body '<review>'", workdir="/home/devuser/project")
+terminal(command="gh pr comment 86 --body '<review>'", workdir="$HOME/project")
 ```
 
 ## Rules

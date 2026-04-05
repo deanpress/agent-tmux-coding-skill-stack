@@ -34,7 +34,7 @@ It is not part of the required core path. The default `python3 scripts/install_s
 Install it only when OMX is explicitly desired:
 
 ```bash
-python3 scripts/install_stack.py --dest /home/USER/.hermes/skills --include-skill oh-my-codex
+python3 scripts/install_stack.py --dest "$HOME/.hermes/skills" --include-skill oh-my-codex
 ```
 
 If a target environment wants OMX, use the guidance in `extensions/omx/README.md` and `extensions/omx/omx_backend_notes.md`.
