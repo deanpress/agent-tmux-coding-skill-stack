@@ -1,12 +1,12 @@
 ---
 name: tmux-cli-agent-supervisor
-description: Use the standalone tmux supervisor infrastructure to launch and autonomously supervise Codex CLI, Gemini CLI, or Claude Code without requiring continual manual polling.
+description: Use the standalone tmux supervisor infrastructure to launch and autonomously supervise Codex CLI, Gemini CLI, Claude Code, or OpenCode without requiring continual manual polling.
 version: 1.0.0
 author: Hermes Agent
 license: MIT
 metadata:
   hermes:
-    tags: [tmux, supervisor, codex, gemini, claude-code, automation]
+    tags: [tmux, supervisor, codex, gemini, claude-code, opencode, automation]
     related_skills: [cli-coding-agent-orchestrator, tmux-cli-agent-checkin, tmux-cli-agent-resume]
 ---
 
@@ -64,14 +64,17 @@ Especially:
 
 Example launch pattern:
 - `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/tmux_cli_supervisor.py" --agent codex --workdir /abs/path --prompt-file /abs/path/prompt.txt --ready-timeout 45 --substantial-job --require-commit --notify-on-state`
+- `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/tmux_cli_supervisor.py" --agent opencode --workdir /abs/path --prompt-file /abs/path/prompt.txt --ready-timeout 20 --substantial-job --require-commit --notify-on-state`
 - thin wrapper: `bash "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/run_codex_supervised.sh" --workdir /abs/path --prompt-file /abs/path/prompt.txt --ready-timeout 45 --substantial-job --require-commit --notify-on-state`
-- job manager: `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py" start --name my-job --workdir /abs/path --prompt-file /abs/path/prompt.txt --substantial-job --require-commit`
+- thin wrapper: `bash "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/run_opencode_supervised.sh" --workdir /abs/path --prompt-file /abs/path/prompt.txt --ready-timeout 20 --substantial-job --require-commit --notify-on-state`
+- job manager: `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py" start --agent codex --name my-job --workdir /abs/path --prompt-file /abs/path/prompt.txt --substantial-job --require-commit`
+- job manager: `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py" start --agent opencode --name my-job --workdir /abs/path --prompt-file /abs/path/prompt.txt --substantial-job --require-commit`
 - job check-in: `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py" checkin my-job`
 - job resume: `python3 "${HERMES_HOME:-$HOME/.hermes}/skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py" resume my-job --prompt "Continue from the current state and finish the remaining work."`
 
-For Codex in this skill stack, the supervisor launches `codex --yolo` directly. The supervisor auto-accepts the initial Codex trust prompt in tmux, waits for readiness, sends the task prompt, drives the review/fix loop for substantial jobs, and can optionally hold completion until a git commit is created. The job manager adds named start/status/checkin/resume/tail/list/kill operations.
+For Codex in this skill stack, the supervisor launches `codex --yolo` directly. For OpenCode, it launches plain `opencode`, which starts the OpenCode TUI. The supervisor auto-accepts the initial Codex trust prompt in tmux when it appears, waits for readiness, sends the task prompt, drives the review/fix loop for substantial jobs, and can optionally hold completion until a git commit is created. The job manager adds named start/status/checkin/resume/tail/list/kill operations.
 
 ## Desired outcome
 The coding job should continue under actual automated supervision infrastructure, not just ad hoc assistant polling.
 
-For Codex specifically, prefer the named wrapper `scripts/codex_job.py` when you want start/status/checkin/resume/tail/list/kill ergonomics on top of the supervisor.
+For Codex and OpenCode specifically, prefer the named wrapper `scripts/codex_job.py` with `--agent ...` when you want start/status/checkin/resume/tail/list/kill ergonomics on top of the supervisor.

@@ -6,7 +6,7 @@ author: Hermes Agent
 license: MIT
 metadata:
   hermes:
-    tags: [tmux, resume, codex, gemini, claude-code, orchestration]
+    tags: [tmux, resume, codex, gemini, claude-code, opencode, orchestration]
     related_skills: [cli-coding-agent-orchestrator, tmux-cli-agent-checkin]
 ---
 
@@ -18,6 +18,7 @@ Typical requests:
 - "resume the codex run"
 - "continue the gemini session"
 - "reattach to claude code and keep going"
+- "resume the opencode run"
 - "pick up where that tmux agent left off"
 
 ## Purpose

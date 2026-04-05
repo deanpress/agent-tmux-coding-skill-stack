@@ -102,7 +102,7 @@ def cmd_start(args) -> int:
 
     base = args.name or f"{sanitize(workdir.name)}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
     job = sanitize(base)
-    session = args.session or f'ai-codex-{job}'
+    session = args.session or f'ai-{args.agent}-{job}'
     job_file = JOBS_DIR / f'{job}.json'
     if job_file.exists():
         raise SystemExit(f'job already exists: {job}')
@@ -113,7 +113,7 @@ def cmd_start(args) -> int:
     cmd = [
         sys.executable,
         str(SUPERVISOR),
-        '--agent', 'codex',
+        '--agent', args.agent,
         '--workdir', str(workdir),
         '--session', session,
         '--poll-seconds', str(args.poll_seconds),
@@ -137,6 +137,7 @@ def cmd_start(args) -> int:
 
     payload = {
         'job': job,
+        'agent': args.agent,
         'session': session,
         'workdir': str(workdir),
         'prompt_file': str(prompt_file) if prompt_file else None,
@@ -165,6 +166,7 @@ def summarize(job_meta: dict) -> dict:
     session = job_meta['session']
     return {
         'job': job_meta['job'],
+        'agent': job_meta.get('agent', 'codex'),
         'session': session,
         'workdir': job_meta['workdir'],
         'supervisor_pid': pid,
@@ -248,10 +250,11 @@ def cmd_kill(args) -> int:
 
 
 def build_parser():
-    p = argparse.ArgumentParser(description='Manage supervised Codex tmux jobs.')
+    p = argparse.ArgumentParser(description='Manage supervised tmux coding-agent jobs.')
     sub = p.add_subparsers(dest='cmd', required=True)
 
     s = sub.add_parser('start')
+    s.add_argument('--agent', choices=['codex', 'gemini', 'claude', 'opencode'], default='codex')
     s.add_argument('--name')
     s.add_argument('--session')
     s.add_argument('--workdir', required=True)

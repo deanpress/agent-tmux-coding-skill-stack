@@ -2,7 +2,7 @@
 
 A portable tmux-based coding-agent skill stack for Hermes-style agents.
 
-This repository packages a structured set of autonomous coding skills centered around vanilla Codex (`codex --yolo`) plus tmux supervision, check-ins, resume flows, and prompt templates. It also includes an optional OMX extension for environments that want `oh-my-codex` without making it a core dependency.
+This repository packages a structured set of autonomous coding skills centered around vanilla Codex (`codex --yolo`) plus tmux supervision, check-ins, resume flows, and prompt templates. It also includes first-class OpenCode support and an optional OMX extension for environments that want `oh-my-codex` without making it a core dependency.
 
 ## Goals
 
@@ -16,6 +16,7 @@ This repository packages a structured set of autonomous coding skills centered a
 ## Included skills
 
 - `codex`
+- `opencode`
 - `claude-code`
 - `cli-coding-agent-orchestrator`
 - `tmux-cli-agent-supervisor`
@@ -58,7 +59,7 @@ Only portable skill content, prompt templates, and helper scripts are included.
 
 - Safe to publish: the tracked tree is intended to be portable and credential-free.
 - Supported baseline: local scripts, docs, installer flow, and tmux smoke tests for the Codex-supervisor path.
-- Current focus: Codex-first orchestration. Gemini CLI and Claude Code are supported by the shared supervisor, but the deepest local smoke coverage is still on the Codex path.
+- Current focus: Codex-first orchestration. Gemini CLI, Claude Code, and OpenCode are supported by the shared supervisor, while the deepest local ergonomics are still on the Codex-first job-manager path.
 - Expected operator model: supervise and inspect only sessions this stack spawned, unless you explicitly choose to adopt an external tmux session.
 
 ## Prerequisites on the target machine
@@ -66,6 +67,7 @@ Only portable skill content, prompt templates, and helper scripts are included.
 - Python 3
 - tmux
 - Codex CLI (`codex`)
+- optional: OpenCode (`opencode`) if you want that path
 - optional: Claude Code (`claude`) if you want that path
 - optional: Gemini CLI (`gemini`) if you want that path
 - a Hermes-compatible skill directory, usually `~/.hermes/skills`
@@ -99,7 +101,8 @@ The supervisor/job-manager runtime defaults to the installed stack root and writ
 ## Notes
 
 - This stack is Codex-first and uses vanilla `codex --yolo` in the orchestration layer.
-- The included `codex` skill and tmux supervisor scripts are already aligned to that behavior.
+- The included `codex`, `opencode`, and tmux supervisor scripts are aligned to those supported CLI surfaces.
+- OpenCode is supported through the shared supervisor using plain `opencode` for interactive tmux sessions and `opencode run` for one-shot work.
 - The supervisor stack can enforce `implement -> review -> fix -> commit` when launched with `--substantial-job --require-commit`.
 - Commit-required runs record `HEAD` and `git status --short` evidence in the supervisor status payload.
 

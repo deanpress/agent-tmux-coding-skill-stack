@@ -43,15 +43,24 @@ def make_commit() -> None:
     subprocess.run(["git", "commit", "-m", "fake codex commit"], check=True)
 
 
-def startup(delay: float) -> None:
-    emit("Do you trust the contents of this directory?")
-    while wait_for_line().strip() != "1":
-        pass
-    emit("Press Enter to continue")
-    while wait_for_line().strip():
-        pass
+def startup(delay: float, startup_mode: str) -> None:
+    if startup_mode == "codex":
+        emit("Do you trust the contents of this directory?")
+        while wait_for_line().strip() != "1":
+            pass
+        emit("Press Enter to continue")
+        while wait_for_line().strip():
+            pass
+    elif startup_mode == "opencode":
+        emit("OpenCode session booting")
+    else:
+        raise SystemExit(f"unknown startup mode: {startup_mode}")
     time.sleep(delay)
-    emit("model: gpt-5.4")
+    if startup_mode == "opencode":
+        emit("OpenCode model ready")
+        emit("session: local")
+    else:
+        emit("model: gpt-5.4")
     emit("(esc to interrupt)")
     append_trace("ready", "shown")
 
@@ -119,10 +128,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", required=True)
     parser.add_argument("--startup-delay", type=float, default=0.05)
+    parser.add_argument("--startup-mode", choices=["codex", "opencode"], default="codex")
     parser.add_argument("--make-commit", action="store_true")
     args, _ = parser.parse_known_args()
 
-    startup(args.startup_delay)
+    startup(args.startup_delay, args.startup_mode)
 
     prompt = ""
     while not prompt:

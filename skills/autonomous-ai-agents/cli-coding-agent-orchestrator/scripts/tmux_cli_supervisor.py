@@ -26,11 +26,13 @@ DEFAULT_READY_TIMEOUTS = {
     "codex": 45,
     "gemini": 20,
     "claude": 20,
+    "opencode": 20,
 }
 MIN_READY_WAIT = {
     "codex": 18,
     "gemini": 5,
     "claude": 5,
+    "opencode": 5,
 }
 TRUST_PROMPT_HINTS = [
     "do you trust the contents of this directory",
@@ -62,6 +64,13 @@ READY_HINTS = {
         "sonnet",
         "opus",
         "thinking",
+    ],
+    "opencode": [
+        "opencode",
+        "session",
+        "model",
+        "agent",
+        "esc to interrupt",
     ],
 }
 
@@ -193,6 +202,9 @@ def agent_launch_command(agent: str, extra: str | None = None) -> str:
     elif agent == "claude":
         claude_bin = os.environ.get("HERMES_SUPERVISOR_CLAUDE_BIN", "claude")
         base = f"export TERM=xterm-256color && {claude_bin} --dangerously-skip-permissions"
+    elif agent == "opencode":
+        opencode_bin = os.environ.get("HERMES_SUPERVISOR_OPENCODE_BIN", "opencode")
+        base = f"export TERM=xterm-256color && {opencode_bin}"
     else:
         raise ValueError(f"unknown agent: {agent}")
     if extra:
@@ -281,7 +293,7 @@ def nudge_text(current_state: str) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Launch and supervise a tmux-based coding CLI agent.")
-    ap.add_argument("--agent", choices=["codex", "gemini", "claude"], required=True)
+    ap.add_argument("--agent", choices=["codex", "gemini", "claude", "opencode"], required=True)
     ap.add_argument("--workdir", required=True)
     group = ap.add_mutually_exclusive_group(required=True)
     group.add_argument("--prompt")

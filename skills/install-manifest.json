@@ -3,6 +3,7 @@
     "claude-code": { "tier": "core" },
     "cli-coding-agent-orchestrator": { "tier": "core" },
     "codex": { "tier": "core" },
+    "opencode": { "tier": "core" },
     "oh-my-codex": { "tier": "optional" },
     "tmux-cli-agent-checkin": { "tier": "core" },
     "tmux-cli-agent-resume": { "tier": "core" },

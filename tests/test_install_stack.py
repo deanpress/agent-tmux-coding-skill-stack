@@ -32,6 +32,7 @@ class InstallStackTests(unittest.TestCase):
         payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
         self.assertEqual(payload["skills"]["oh-my-codex"]["tier"], "optional")
         self.assertEqual(payload["skills"]["codex"]["tier"], "core")
+        self.assertEqual(payload["skills"]["opencode"]["tier"], "core")
 
     def test_default_install_skips_optional_skill(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -77,6 +78,11 @@ class InstallStackTests(unittest.TestCase):
         cmd = bootstrap_doctor.install_command(repo_root, dest, ["oh-my-codex"])
         self.assertIn("'/tmp/repo with spaces/scripts/install_stack.py'", cmd)
         self.assertIn("'/tmp/dest with spaces'", cmd)
+
+    def test_bootstrap_launch_command_includes_explicit_agent(self) -> None:
+        dest = Path("/tmp/hermes-skills")
+        cmd = bootstrap_doctor.launch_command(dest)
+        self.assertIn("--agent codex", cmd)
 
     def test_commit_phase_requires_new_head_after_prompt(self) -> None:
         self.assertFalse(tmux_cli_supervisor.commit_phase_completed(None, None))

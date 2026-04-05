@@ -37,17 +37,20 @@ class SupervisorTests(unittest.TestCase):
         self.tmux_tmpdir = self.root / "tmux"
         self.tmux_tmpdir.mkdir()
         self.trace_file = self.root / "trace.log"
-        self._write_fake_codex_wrapper()
+        self._write_fake_cli_wrapper("codex", "codex")
+        self._write_fake_cli_wrapper("opencode", "opencode")
         self.env = os.environ.copy()
         self.env.update(
             {
                 "PATH": f"{self.bin_dir}:{self.env.get('PATH', '')}",
                 "HERMES_HOME": str(self.hermes_home),
                 "HERMES_SUPERVISOR_CODEX_BIN": str(self.bin_dir / "codex"),
+                "HERMES_SUPERVISOR_OPENCODE_BIN": str(self.bin_dir / "opencode"),
                 "FAKE_CODEX_TRACE_FILE": str(self.trace_file),
                 "TMUX_TMPDIR": str(self.tmux_tmpdir),
                 "HERMES_SUPERVISOR_READY_CHECK_SECONDS": "0.1",
                 "HERMES_SUPERVISOR_MIN_READY_WAIT_CODEX": "0.2",
+                "HERMES_SUPERVISOR_MIN_READY_WAIT_OPENCODE": "0.2",
                 "HERMES_SUPERVISOR_IDLE_NUDGE_UNCHANGED_POLLS": "2",
                 "HERMES_SUPERVISOR_BLOCKED_UNCHANGED_POLLS": "4",
                 "HERMES_SUPERVISOR_NUDGE_COOLDOWN_SECONDS": "0",
@@ -63,17 +66,17 @@ class SupervisorTests(unittest.TestCase):
             tmux_cleanup(session)
         self.tmp.cleanup()
 
-    def _write_fake_codex_wrapper(self) -> None:
-        wrapper = self.bin_dir / "codex"
+    def _write_fake_cli_wrapper(self, command_name: str, startup_mode: str) -> None:
+        wrapper = self.bin_dir / command_name
         wrapper.write_text(
             "#!/usr/bin/env bash\n"
             "set -euo pipefail\n"
-            f'python3 "{FAKE_CODEX}" "$@"\n',
+            f'python3 "{FAKE_CODEX}" --startup-mode {startup_mode} "$@"\n',
             encoding="utf-8",
         )
         wrapper.chmod(0o755)
 
-    def _run_supervisor(self, workdir: Path, scenario: str, *, substantial: bool = False, require_commit: bool = False, make_commit: bool = False, session: str = "test-session") -> subprocess.CompletedProcess[str]:
+    def _run_supervisor(self, workdir: Path, scenario: str, *, agent: str = "codex", substantial: bool = False, require_commit: bool = False, make_commit: bool = False, session: str = "test-session") -> subprocess.CompletedProcess[str]:
         self.sessions.append(session)
         extra = f"--scenario {scenario}"
         if make_commit:
@@ -82,7 +85,7 @@ class SupervisorTests(unittest.TestCase):
             "python3",
             str(SUPERVISOR),
             "--agent",
-            "codex",
+            agent,
             "--workdir",
             str(workdir),
             "--prompt",
@@ -102,7 +105,7 @@ class SupervisorTests(unittest.TestCase):
             cmd.append("--require-commit")
         return subprocess.run(cmd, check=True, text=True, capture_output=True, env=self.env, cwd=REPO_ROOT)
 
-    def _run_supervisor_async(self, workdir: Path, scenario: str, *, substantial: bool = False, require_commit: bool = False, make_commit: bool = False, session: str = "test-session-async") -> subprocess.Popen[str]:
+    def _run_supervisor_async(self, workdir: Path, scenario: str, *, agent: str = "codex", substantial: bool = False, require_commit: bool = False, make_commit: bool = False, session: str = "test-session-async") -> subprocess.Popen[str]:
         self.sessions.append(session)
         extra = f"--scenario {scenario}"
         if make_commit:
@@ -111,7 +114,7 @@ class SupervisorTests(unittest.TestCase):
             "python3",
             str(SUPERVISOR),
             "--agent",
-            "codex",
+            agent,
             "--workdir",
             str(workdir),
             "--prompt",
@@ -166,6 +169,19 @@ class SupervisorTests(unittest.TestCase):
         self.assertLess(ready_index, prompt_index)
         self.assertIn("codex_trust_prompt_accepted", result.stdout)
         self.assertIn("continue_prompt_confirmed", result.stdout)
+        self.assertIn("agent_ready", result.stdout)
+
+    def test_opencode_startup_reaches_ready_without_codex_prompt_handling(self) -> None:
+        workdir = self.root / "repo-opencode"
+        workdir.mkdir()
+        result = self._run_supervisor(workdir, "steady-complete", agent="opencode", session="opencode-flow")
+        self.assertIn("opencode-flow", result.stdout)
+        trace = self.trace_file.read_text(encoding="utf-8").splitlines()
+        ready_index = next(i for i, line in enumerate(trace) if line.startswith("ready:"))
+        prompt_index = next(i for i, line in enumerate(trace) if line.startswith("prompt:"))
+        self.assertLess(ready_index, prompt_index)
+        self.assertNotIn("codex_trust_prompt_accepted", result.stdout)
+        self.assertNotIn("continue_prompt_confirmed", result.stdout)
         self.assertIn("agent_ready", result.stdout)
 
     def test_idle_session_gets_nudged_and_completes(self) -> None:
@@ -286,6 +302,45 @@ class SupervisorTests(unittest.TestCase):
         self.assertTrue(resume_payload["resumed"])
         updated_events = events.read_text(encoding="utf-8")
         self.assertIn("resume_prompt_sent", updated_events)
+
+    def test_job_manager_start_supports_opencode_agent(self) -> None:
+        workdir = self.root / "repo-opencode-job"
+        workdir.mkdir()
+        session = "job-opencode"
+        self.sessions.append(session)
+        result = subprocess.run(
+            [
+                "python3",
+                str(JOB_MANAGER),
+                "start",
+                "--agent",
+                "opencode",
+                "--name",
+                "demo-opencode",
+                "--session",
+                session,
+                "--workdir",
+                str(workdir),
+                "--prompt",
+                "do the thing",
+                "--poll-seconds",
+                "0",
+                "--ready-timeout",
+                "2",
+                "--extra-launch-args",
+                "--scenario steady-complete",
+            ],
+            check=True,
+            text=True,
+            capture_output=True,
+            env=self.env,
+            cwd=REPO_ROOT,
+        )
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["session"], session)
+        meta_path = self.hermes_home / "agent-supervisor" / "jobs" / "demo-opencode.json"
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        self.assertEqual(meta["agent"], "opencode")
 
 
 if __name__ == "__main__":

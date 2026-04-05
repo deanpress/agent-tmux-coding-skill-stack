@@ -1,13 +1,13 @@
 ---
 name: cli-coding-agent-orchestrator
-description: Orchestrate Codex CLI, Gemini CLI, or Claude Code in a dedicated tmux session for autonomous coding work. Creates a strong initial prompt, monitors every 30 seconds, nudges when idle, splits work into phases when needed, and requires a final review/fix loop for substantial jobs.
+description: Orchestrate Codex CLI, Gemini CLI, Claude Code, or OpenCode in a dedicated tmux session for autonomous coding work. Creates a strong initial prompt, monitors every 30 seconds, nudges when idle, splits work into phases when needed, and requires a final review/fix loop for substantial jobs.
 version: 1.0.0
 author: Hermes Agent
 license: MIT
 metadata:
   hermes:
-    tags: [tmux, codex, gemini, claude-code, orchestration, autonomous-agents, review]
-    related_skills: [codex, claude-code, writing-plans, subagent-driven-development, deployment-readiness-pass]
+    tags: [tmux, codex, gemini, claude-code, opencode, orchestration, autonomous-agents, review]
+    related_skills: [codex, claude-code, opencode, writing-plans, subagent-driven-development, deployment-readiness-pass]
 ---
 
 # CLI Coding Agent Orchestrator
@@ -16,6 +16,7 @@ Use this skill when the user explicitly wants work done via a local coding CLI a
 - Codex CLI
 - Gemini CLI
 - Claude Code
+- OpenCode
 
 This skill is for **interactive autonomous CLI agents running inside tmux**, not one-shot `codex exec` style jobs.
 
@@ -74,6 +75,13 @@ Preferred launch when user requests it:
 
 If local version differs, check help and use the nearest equivalent high-autonomy flag.
 
+### OpenCode
+Preferred interactive launch when user requests it:
+- `opencode`
+
+For one-shot non-interactive work, use:
+- `opencode run "prompt"`
+
 ## When to use one phase vs multi-phase
 
 ### Single-phase is appropriate when:
@@ -117,6 +125,7 @@ Use a deterministic session name, e.g.:
 - `ai-codex-<project>-<shortid>`
 - `ai-gemini-<project>-<shortid>`
 - `ai-claude-<project>-<shortid>`
+- `ai-opencode-<project>-<shortid>`
 
 Sanitize project names to shell-safe/tmux-safe strings.
 
@@ -293,6 +302,7 @@ Examples:
 - `ai-codex-treasuries-api-1430`
 - `ai-gemini-wildcard-golf-0915`
 - `ai-claude-bcp-dashboard-2210`
+- `ai-opencode-analytics-api-1030`
 
 Use lowercase, hyphenated project names.
 
@@ -361,6 +371,11 @@ Rules:
 - explicitly mark phases for larger jobs
 - use `claude --dangerously-skip-permissions`
 
+### OpenCode
+- prefer plain `opencode` for interactive tmux work
+- use `opencode run` for one-shot automation instead of the TUI
+- keep the same supervisor markers and completion protocol as the other agents
+
 ## Review severity policy (v2)
 
 After `/review unstaged changes` and `<< Code review finished >>`:
@@ -392,6 +407,7 @@ If helpful and low-friction, store it in a local scratch note/file associated wi
 This skill now includes actual automation infrastructure via:
 - `scripts/tmux_cli_supervisor.py`
 - `scripts/run_codex_supervised.sh` (thin Codex supervisor wrapper)
+- `scripts/run_opencode_supervised.sh` (thin OpenCode supervisor wrapper)
 - `scripts/codex_job.py` (job-name based start/status/checkin/resume/tail/list/kill manager)
 
 The supervisor is intended to:

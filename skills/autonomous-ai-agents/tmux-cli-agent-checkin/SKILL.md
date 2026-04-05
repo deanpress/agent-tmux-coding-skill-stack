@@ -1,12 +1,12 @@
 ---
 name: tmux-cli-agent-checkin
-description: Check in on an existing tmux-based coding CLI agent session (Codex, Gemini CLI, or Claude Code), summarize progress, detect idleness, and optionally send a steering prompt.
+description: Check in on an existing tmux-based coding CLI agent session (Codex, Gemini CLI, Claude Code, or OpenCode), summarize progress, detect idleness, and optionally send a steering prompt.
 version: 1.0.0
 author: Hermes Agent
 license: MIT
 metadata:
   hermes:
-    tags: [tmux, monitoring, codex, gemini, claude-code, checkin, orchestration]
+    tags: [tmux, monitoring, codex, gemini, claude-code, opencode, checkin, orchestration]
     related_skills: [cli-coding-agent-orchestrator]
 ---
 
@@ -19,6 +19,7 @@ Typical requests:
 - "see how the tmux coding job is doing"
 - "check the gemini session"
 - "is claude code idle?"
+- "check the opencode session"
 - "send it a follow-up if needed"
 
 ## Purpose
@@ -28,6 +29,7 @@ It is for inspecting and optionally steering an existing tmux session that is al
 - Codex CLI
 - Gemini CLI
 - Claude Code
+- OpenCode
 
 Default ownership boundary:
 - only inspect or steer tmux sessions that this skill stack launched and recorded under `${HERMES_HOME:-$HOME/.hermes}/agent-supervisor/<session>/`
@@ -38,7 +40,7 @@ Default ownership boundary:
 Try to determine:
 - tmux session name
 - workdir/project
-- agent type (codex / gemini / claude)
+- agent type (codex / gemini / claude / opencode)
 - original goal if available
 
 If the session name is not given, first look for owned supervisor sessions under the runtime log root and infer the best candidate from those artifacts.
@@ -50,7 +52,7 @@ Only broaden the search to arbitrary tmux sessions when the user explicitly asks
 Inspect owned supervisor sessions first and identify the likely coding-agent session from runtime artifacts and matching tmux sessions.
 Useful clues:
 - session names containing project/agent labels
-- pane text showing `codex`, `gemini`, or `claude`
+- pane text showing `codex`, `gemini`, `claude`, or `opencode`
 - repo path visible in prompt output
 
 Important: if a Hermes background `process` handle for the supervisor returns `not_found`, do not treat that as completion. The process registry entry may have expired while the tmux session is still alive. In that case, fall back immediately to the owned supervisor artifacts under the runtime log root, typically `${HERMES_HOME:-$HOME/.hermes}/agent-supervisor/<session>/`, and verify the matching tmux session directly.
@@ -134,7 +136,7 @@ Return a concise summary with:
 
 ## Good output format
 - Session: `...`
-- Agent: `Codex/Gemini/Claude Code`
+- Agent: `Codex/Gemini/Claude Code/OpenCode`
 - Status: `working / idle / blocked / review / complete-ish / stuck`
 - Latest activity: `...`
 - Action taken: `none / sent follow-up prompt`

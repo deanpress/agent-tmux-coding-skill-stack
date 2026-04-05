@@ -35,10 +35,12 @@ jobs:
             skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/codex_job.py \
             tests/fixtures/fake_codex.py \
             tests/test_install_stack.py \
-            tests/test_supervisor.py
+            tests/test_supervisor.py \
+            tests/test_tmux_checkin.py
       - name: Shell syntax check
         run: |
           bash -n skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/run_codex_supervised.sh
+          bash -n skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/run_opencode_supervised.sh
           bash -n skills/autonomous-ai-agents/cli-coding-agent-orchestrator/scripts/tmux_agent_control.sh
           bash -n skills/autonomous-ai-agents/tmux-cli-agent-checkin/scripts/tmux_checkin.sh
       - name: Run unit and tmux smoke tests

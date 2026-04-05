@@ -36,6 +36,8 @@ def launch_command(dest: Path) -> str:
             "python3",
             str(job),
             "start",
+            "--agent",
+            "codex",
             "--name",
             "my-job",
             "--workdir",
@@ -77,6 +79,7 @@ def main() -> int:
         check_binary("tmux"),
         check_binary("git"),
         check_binary("codex"),
+        check_binary("opencode"),
         check_binary("omx"),
     ]
     payload = {
